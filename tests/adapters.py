@@ -29,7 +29,17 @@ def run_linear(
         Float[Tensor, "... d_out"]: The transformed output of your linear module.
     """
 
-    raise NotImplementedError
+    from cs336_basics.linear import Linear
+    linear = Linear(
+        in_features=d_in,
+        out_features=d_out,
+        device=weights.device,
+        dtype=weights.dtype,
+    )
+    state_dict = {'W': weights}
+    linear.load_state_dict(state_dict)
+
+    return linear(in_features)
 
 
 def run_embedding(
@@ -51,8 +61,17 @@ def run_embedding(
         Float[Tensor, "... d_model"]: Batch of embeddings returned by your Embedding layer.
     """
 
-    raise NotImplementedError
+    from cs336_basics.embedding import Embedding
+    embedding = Embedding(
+        num_embeddings=vocab_size,
+        embedding_dim=d_model,
+        device=weights.device,
+        dtype=weights.dtype,
+    )
+    state_dict = {'W': weights}
+    embedding.load_state_dict(state_dict)
 
+    return embedding(token_ids)
 
 def run_swiglu(
     d_model: int,
@@ -287,7 +306,8 @@ def run_transformer_lm(
     weights: dict[str, Tensor],
     in_indices: Int[Tensor, " batch_size sequence_length"],
 ) -> Float[Tensor, " batch_size sequence_length vocab_size"]:
-    """Given the weights of a Transformer language model and input indices,
+    """
+    Given the weights of a Transformer language model and input indices,
     return the output of running a forward pass on the input indices.
 
     This function should use RoPE.
@@ -420,8 +440,7 @@ def run_get_batch(
 
 def run_softmax(in_features: Float[Tensor, " ..."], dim: int) -> Float[Tensor, " ..."]:
     """
-    Given a tensor of inputs, return the output of softmaxing the given `dim`
-    of the input.
+    Given a tensor of inputs, return the output of softmaxing the given `dim` of the input.
 
     Args:
         in_features (Float[Tensor, "..."]): Input features to softmax. Shape is arbitrary.
